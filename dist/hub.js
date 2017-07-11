@@ -28,13 +28,13 @@
    *
    * @param {array} permissions An array of objects with origin and allow
    */
-  CrossStorageHub.init = function(permissions) {
+  CrossStorageHub.init = function(permissions, storage) {
     var available = true;
-
+    this.storage = storage === 'session' ? window.sessionStorage : window.localStorage
     // Return if localStorage is unavailable, or third party
     // access is disabled
     try {
-      if (!window.localStorage) available = false;
+      if (!this.storage) available = false;
     } catch (e) {
       available = false;
     }
@@ -165,7 +165,7 @@
    * @param {object} params An object with key and value
    */
   CrossStorageHub._set = function(params) {
-    window.localStorage.setItem(params.key, params.value);
+    this.storage.setItem(params.key, params.value);
   };
 
   /**
@@ -179,7 +179,7 @@
   CrossStorageHub._get = function(params) {
     var storage, result, i, value;
 
-    storage = window.localStorage;
+    storage = this.storage;
     result = [];
 
     for (i = 0; i < params.keys.length; i++) {
@@ -202,7 +202,7 @@
    */
   CrossStorageHub._del = function(params) {
     for (var i = 0; i < params.keys.length; i++) {
-      window.localStorage.removeItem(params.keys[i]);
+      this.storage.removeItem(params.keys[i]);
     }
   };
 
@@ -210,7 +210,7 @@
    * Clears localStorage.
    */
   CrossStorageHub._clear = function() {
-    window.localStorage.clear();
+    this.storage.clear();
   };
 
   /**
@@ -222,10 +222,10 @@
     var i, length, keys;
 
     keys = [];
-    length = window.localStorage.length;
+    length = this.storage.length;
 
     for (i = 0; i < length; i++) {
-      keys.push(window.localStorage.key(i));
+      keys.push(this.storage.key(i));
     }
 
     return keys;
